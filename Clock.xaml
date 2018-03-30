@@ -1,0 +1,182 @@
+<UserControl x:Class="Clock" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:local="clr-namespace:">
+<x:Code>
+<![CDATA[
+public ClockWatch clockWatch;
+public Clock()
+{
+	InitializeComponent();
+	clockWatch = (ClockWatch)Resources["newClock"];
+}
+
+private void clockButton_Click(object O,RoutedEventArgs e)
+{
+	Button someButton = O as Button;
+	switch(someButton.Name)
+	{
+		case "hoursUp":
+			UpHour();
+			break;
+		case "hoursDown":
+			DownHour();
+			break;
+		case "minutesUp":
+			UpMinute();
+			break;
+		case "minutesDown":
+			DownMinute();
+			break;
+		case "secondsUp":
+			UpSecond();
+			break;
+		case "secondsDown":
+			DownSecond();
+			break;
+		case "ticksUp":
+			UpTick();
+			break;
+		case "ticksDown":
+			DownTick();
+			break;
+			
+			
+		e.Handled=true;
+	}
+}
+private void DownSecond()
+{
+	if(clockWatch.Seconds>0)
+		clockWatch.Seconds--;
+	else
+		if(DownMinute())
+		clockWatch.Seconds=59;
+}
+private void UpSecond()
+{
+	if(clockWatch.Seconds<59)
+		clockWatch.Seconds++;
+	else
+		if(UpMinute())
+		clockWatch.Seconds=0;
+}
+
+private bool DownMinute()
+{
+	if(clockWatch.Minutes>0)
+	{
+		clockWatch.Minutes--;
+		return true;
+	}	
+	else
+		
+		if(DownHour())
+		{
+			clockWatch.Minutes=59;
+			return true;
+		}
+		else
+			return false;
+}
+private bool UpMinute()
+{
+	if(clockWatch.Minutes<59)
+	{
+		clockWatch.Minutes++;
+		return true;
+	}	
+	else
+		
+		if(UpHour())
+		{
+			clockWatch.Minutes=0;
+			return true;
+		}
+		else
+			return false;
+}
+
+private bool DownHour()
+{
+	if(clockWatch.Hours>0)
+	{
+		clockWatch.Hours--;
+		return 	true;
+	}
+	else
+	return false;	
+}
+private bool UpHour()
+{
+	if(clockWatch.Hours<23)
+	{
+		clockWatch.Hours++;
+		return 	true;
+	}
+	else
+	return false;	
+}
+private bool UpTick()
+{
+	if(clockWatch.Ticks<(24*60*60-1))
+	{
+		clockWatch.Ticks++;
+		return 	true;
+	}
+	else
+	return false;	
+}
+private bool DownTick()
+{
+	if(clockWatch.Ticks>0)
+	{
+		clockWatch.Ticks--;
+		return 	true;
+	}
+	else
+	return false;	
+}
+]]>
+</x:Code>
+<UserControl.Resources>
+<local:ClockWatch x:Key="newClock"/>
+</UserControl.Resources>
+<UserControl.DataContext>
+	<Binding Source="{StaticResource newClock}"/>
+</UserControl.DataContext>
+<Grid>
+	<Grid.ColumnDefinitions>
+		<ColumnDefinition Width="*"/>
+		<ColumnDefinition Width="*"/>
+		<ColumnDefinition Width="*"/>
+		<ColumnDefinition Width="*"/>
+		<ColumnDefinition Width="*"/>
+		<ColumnDefinition Width="*"/>
+		<ColumnDefinition Width="*"/>
+		<ColumnDefinition Width="*"/>
+	</Grid.ColumnDefinitions>
+	<Grid.RowDefinitions>
+	<RowDefinition/>
+	</Grid.RowDefinitions>
+	<TextBox Name = "hourBox" Grid.Column="0" Text ="{Binding Path=Hours,StringFormat='{}{0:00}'}">
+	</TextBox>
+	<StackPanel Grid.Column="1">
+		<Button Name="hoursUp"   FontFamily="Marlett" Content="5" Click="clockButton_Click"/>
+		<Button Name="hoursDown" FontFamily="Marlett" Content="6" Click="clockButton_Click"/>
+	</StackPanel>
+	<TextBox Grid.Column="2" Text ="{Binding Path=Minutes,StringFormat='{}{0:00}'}"/>
+	<StackPanel Grid.Column="3">
+		<Button Name="minutesUp"   FontFamily="Marlett" Content="5" Click="clockButton_Click"/>
+		<Button Name="minutesDown" FontFamily="Marlett" Content="6" Click="clockButton_Click"/>
+	</StackPanel>
+	<TextBox Grid.Column="4" Text ="{Binding Path=Seconds,StringFormat='{}{0:00}'}"/>
+	<StackPanel Grid.Column="5">
+		<Button Name="secondsUp"   FontFamily="Marlett" Content="5" Click="clockButton_Click"/>
+		<Button Name="secondsDown" FontFamily="Marlett" Content="6" Click="clockButton_Click"/>
+	</StackPanel>
+	<TextBox Name="Ticks" Grid.Column="6" Text ="{Binding Path=Ticks,StringFormat='{}{0:00000}',UpdateSourceTrigger=PropertyChanged}" />
+	<StackPanel Grid.Column="7">
+		<Button Name="ticksUp"   FontFamily="Marlett" Content="5" Click="clockButton_Click"/>
+		<Button Name="ticksDown" FontFamily="Marlett" Content="6" Click="clockButton_Click"/>
+	</StackPanel>
+
+</Grid>
+</UserControl>
