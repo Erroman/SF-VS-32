@@ -15,9 +15,11 @@ partial class Scull_Furnaces_Main_Window
  		const double dashTickLength = 10;
 		const double marginX = 25;
 		const double marginY = 25;
-		const double dashHourTickLength = 10;
-		const double dashHalfHourTickLength = 7;
-		const double dashMinuteTickLength = 5;
+		const double dashHourTickLength = 12;
+		const double dashHalfHourTickLength = 8;
+        const double dashTenMinuteTickLength = 5;
+        const double dashFiveMinuteTickLength = 3;
+        const double dashMinuteTickLength = 2;
 		const double axisLineThickness = 1;
 		double LowerLimitForTimeOnXAxis;
 		double UpperLimitForTimeOnXAxis;
@@ -74,11 +76,6 @@ partial class Scull_Furnaces_Main_Window
 			rectGraphBounds.Width = xmax;
 			rectGraphBounds.Height = ymax;
             double step = Math.Round((xmax - xmin)/(24*6));
-		
-			double dotsPerSecond = (xmax - xmin)/SecondsInADay;
-			int intSecondsPerDot = (int)(SecondsInADay/(xmax - xmin));
-			double dotsPerVolt = 100*step/100;
-
 
 			axisX = new GeometryGroup();
 			
@@ -88,16 +85,15 @@ partial class Scull_Furnaces_Main_Window
 			//Расставляем 10-минутные деления на оси X
 			//Для крупного масштаба расставляем 5 - минутные
 			//и минутные деления.
-			Action<string,Point,HorizontalAlignment,VerticalAlignment> PutLabel = DrawText;;
+			Action<string,Point,HorizontalAlignment,VerticalAlignment> PutLabel = DrawText;
 			PutTimeTicks(3600,dashHourTickLength,PutLabel);
 			PutLabel=null;
 			PutTimeTicks(1800,dashHalfHourTickLength,PutLabel);
-			PutTimeTicks(600,dashMinuteTickLength,PutLabel);
+			PutTimeTicks(600,dashTenMinuteTickLength,PutLabel);
 			if((UpperLimitForTimeOnXAxis-LowerLimitForTimeOnXAxis)/3600<=2)
 			{
-				PutTimeTicks(300,dashMinuteTickLength,PutLabel);
+				PutTimeTicks(300,dashFiveMinuteTickLength,PutLabel);
 				PutTimeTicks(60,dashMinuteTickLength,PutLabel);
-				
 			}
 			
 			Path axisX_path = new Path();
@@ -106,7 +102,7 @@ partial class Scull_Furnaces_Main_Window
 			axisX_path.Data = axisX;
 			
            axisY = new GeometryGroup();
-			
+           PutYTicks(10,10.0,null);
            axisY.Children.Add(new LineGeometry(new Point(xmin, ymin), new Point(xmin, ymax)));
 			
             for (double y = ymax; y >= ymin; y -= step)
@@ -156,7 +152,7 @@ partial class Scull_Furnaces_Main_Window
 		{
 				  onX_axis = WtoD(new Point(Dash,LowerLimitForCurrentOnYAxis));
 				  overX_axis = onX_axis;
-				  overX_axis.Y = overX_axis.Y - TickLength;
+				  overX_axis.Y -= TickLength;
 				  axisX.Children.Add(new LineGeometry
 				(
 					onX_axis,
@@ -176,8 +172,38 @@ partial class Scull_Furnaces_Main_Window
 			return (((int)timeInSeconds / IntervalInSeconds) + (( timeInSeconds % IntervalInSeconds == 0) ? 0:1))*IntervalInSeconds;
 		}
 	}
+    void PutYTicks(int IntervalInAmperes, double TickLength, Action<string, Point, HorizontalAlignment, VerticalAlignment> PutLabel)
+        {
+            Point onY_axis;
+            Point right_toY_axis;
 
-	void DrawText(string text, Point location,
+            for (double Dash = TickMeasure(LowerLimitForCurrentOnYAxis); Dash < UpperLimitForCurrentOnYAxis; Dash += IntervalInAmperes)
+            {
+                onY_axis = WtoD(new Point(LowerLimitForTimeOnXAxis, Dash));
+                right_toY_axis = onY_axis;
+                right_toY_axis.Y += TickLength;
+                axisX.Children.Add(new LineGeometry
+              (
+                  onY_axis,
+                  right_toY_axis
+              )
+              );
+                Point left_toY_axis = onY_axis;
+                left_toY_axis.Y = right_toY_axis.Y;
+                if (PutLabel != null)
+                {
+                    PutLabel(((int)Dash / IntervalInAmperes).ToString(), left_toY_axis, HorizontalAlignment.Center, VerticalAlignment.Top);
+                }
+
+            }
+            double TickMeasure(double CurrentInAmperes)
+            {
+                return (((int)CurrentInAmperes / IntervalInAmperes) + ((CurrentInAmperes % IntervalInAmperes == 0) ? 0 : 1)) * IntervalInAmperes;
+            }
+        }
+
+
+        void DrawText(string text, Point location,
             HorizontalAlignment halign, VerticalAlignment valign)
         {
             // Make the label.

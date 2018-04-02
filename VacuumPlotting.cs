@@ -12,16 +12,11 @@ using System.Text;
 using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using System;
-using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 partial class Scull_Furnaces_Main_Window
@@ -47,8 +42,7 @@ partial class Scull_Furnaces_Main_Window
             double ymin = marginY;
             double ymax = rectBounds.Height-marginY;
             double step = Math.Round((xmax - xmin)/(24*6));
-			
-			string unitOfMeasure;
+		
 			double dotsPerSecond = (xmax - xmin)/SecondsInADay;
 			int intSecondsPerDot = (int)(SecondsInADay/(xmax - xmin));
 			double dotsPerVolt = 100*step/100;
@@ -120,98 +114,10 @@ partial class Scull_Furnaces_Main_Window
             axis_Y_path.Data = axis_Y_geom;
 
             canGraph.Children.Add(axis_Y_path);
-			#if POLYLINE
-			//Значения для графика тока подтягиваются сюда.	
-			//Для рисования через Polyline
-			points = new PointCollection();	
-
-			int numSec = 0;
-			short    intAssembled;
-			double realValueOfFunction;
-			double peakAtInterval = 0;   //максимальное значение функции на интервале
-			double bottomAtInterval = Int32.MaxValue; //минимальное значение функции на интервале
-			Point begPoint = new Point(xmin,ymax);
-			Point endPoint = new Point(xmin,ymax);
-			bool theFirstDotInPair = true;
-			for(
-			int iParam = (int)parameterName/(Constants.ParameterData[(int)(parameterName)].parameterType == ParameterType.аналоговый ? 1:10)+(int)Globals.startOfParameterOutput.TotalSeconds*Constants.ParamsBlockLengthInBytes;     
-			iParam < unpackedParameters.inflatedParameters.Length;
-			iParam = iParam+Constants.ParamsBlockLengthInBytes)
-			{
-				
-				if(Constants.ParameterData[(int)(parameterName)].parameterType == ParameterType.аналоговый)
-				{
-					
-					intAssembled = BitConverter.ToInt16(unpackedParameters.inflatedParameters,iParam);
-					realValueOfFunction = (double)intAssembled/10;
-					switch(Constants.ParameterData[(int)(parameterName)].parameterUnit)
-						{
-							case ParameterUnit._:
-							unitOfMeasure="";
-							break;
-							case ParameterUnit.м3_ч:
-							unitOfMeasure="м3/ч";
-							break;
-							case ParameterUnit.мм_рт_ст:
-							if(intAssembled <0)
-							{	
-							unitOfMeasure="мм рт.ст";
-							intAssembled &= 0x777;
-							}
-							else
-							unitOfMeasure="мк";						
-							break;
-
-						}
-				}		
-				else
-					throw new Exception();
-				//*
-				if(peakAtInterval < realValueOfFunction )peakAtInterval = realValueOfFunction;
-				if(bottomAtInterval > realValueOfFunction )bottomAtInterval = realValueOfFunction;
-				if(numSec%intSecondsPerDot==0)
-				{
-					//отмечать в графике МАКСИМАЛЬЕОЕ значение на интервале
-					//но надо отмечать и МИНИМАЛЬНОЕ !
-					if(!theFirstDotInPair)
-					{
-						points.Add( new Point(xmin +(numSec-1)*dotsPerSecond,ymax - dotsPerVolt*bottomAtInterval));
-						points.Add( new Point(xmin +(numSec)*dotsPerSecond,ymax - dotsPerVolt*peakAtInterval));
-						//points.Add( new Point(xmin +(numSec)*dotsPerSecond,ymax - dotsPerVolt*bottomAtInterval));
-						peakAtInterval = 0;
-						bottomAtInterval = Int32.MaxValue;
-						theFirstDotInPair = true;
-					}
-					else
-						theFirstDotInPair = false;
-				}
-/*				else 
-				if(numSec%intSecondsPerDot==(int)(intSecondsPerDot/2))
-				{
-					//отмечать в графике МАКСИМАЛЬЕОЕ значение на интервале
-					//но надо отмечать и МИНИМАЛЬНОЕ !
-					points.Add( new Point(xmin +(numSec)*dotsPerSecond,ymax - dotsPerVolt*bottomAtInterval));
-					bottomAtInterval = Int32.MaxValue;
-				} */
-				//*
-				/*endPoint = new Point(xmin +(numSec)*dotsPerSecond,ymax - dotsPerVolt*bottomAtInterval);
-				plotGeometry.Children.Add(new LineGeometry(begPoint,endPoint));
-				WriteLine("Dot number {0}",numSec );
-				endPoint = begPoint;
-				points.Add( new Point(xmin +(numSec++)*dotsPerSecond,ymax - dotsPerVolt*(double)intAssembled/10));*/
-				numSec++;		
-				
-			} 
-			Polyline polyline1 = new Polyline();
-			polyline1.StrokeThickness = 1;
-			polyline1.Stroke = Brushes.Red;
-			polyline1.Points = points;
-			canGraph.Children.Add(polyline1); 
-			
-			#else
     		canGraph.Children.Add(new VisualHostForPlot(unpackedParameters,parameterName,rectBounds));
-			#endif
-			return null;
+
+            return null;
+
 		}), null);
 
 	}
