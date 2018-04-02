@@ -1,29 +1,12 @@
 using System;
 using System.Windows;
-using System.Windows.Controls.Primitives;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Threading;
 using static Constants;
 using static System.Console;
 using static TransformWorldToScreen;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
 using System.Windows.Shapes;
-using System;
-using System.Collections.Generic;
-using System.Collections.Specialized;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 partial class Scull_Furnaces_Main_Window
  {
@@ -92,7 +75,6 @@ partial class Scull_Furnaces_Main_Window
 			rectGraphBounds.Height = ymax;
             double step = Math.Round((xmax - xmin)/(24*6));
 		
-			string unitOfMeasure;
 			double dotsPerSecond = (xmax - xmin)/SecondsInADay;
 			int intSecondsPerDot = (int)(SecondsInADay/(xmax - xmin));
 			double dotsPerVolt = 100*step/100;
@@ -106,8 +88,6 @@ partial class Scull_Furnaces_Main_Window
 			//Расставляем 10-минутные деления на оси X
 			//Для крупного масштаба расставляем 5 - минутные
 			//и минутные деления.
-			Point onX_axis;
-			Point overX_axis;
 			Action<string,Point,HorizontalAlignment,VerticalAlignment> PutLabel = DrawText;;
 			PutTimeTicks(3600,dashHourTickLength,PutLabel);
 			PutLabel=null;
@@ -125,38 +105,6 @@ partial class Scull_Furnaces_Main_Window
 			axisX_path.Stroke = Brushes.Black;
 			axisX_path.Data = axisX;
 			
-			
-            /*Make the X axis.*/
-            // GeometryGroup axis_X_geom = new GeometryGroup();
-			
-            // axis_X_geom.Children.Add(new LineGeometry(new Point(xmin, ymax), new Point(xmax, ymax)));
-			
-            // for (double x = xmin + step; x <= xmax ; x += step)
-            // {
-				
-				// if((x-xmin)/step%6 == 0)
-                // axis_X_geom.Children.Add(new LineGeometry
-				// (
-                    // new Point(x, ymax - dashTickLength),
-                    // new Point(x, ymax))
-				// );
-				// else
-                // axis_X_geom.Children.Add(new LineGeometry
-				// (
-                    // new Point(x, ymax - dashTickLength / 2),
-                    // new Point(x, ymax))
-				// );
-					
-            // }
-
-            // Path axis_X_path = new Path();
-            // axis_X_path.StrokeThickness = 1;
-            // axis_X_path.Stroke = Brushes.Black;
-            // axis_X_path.Data = axis_X_geom;
-            
-            // canGraph.Children.Add(axis_X_path);
-
-            // Make the Y ayis.
            axisY = new GeometryGroup();
 			
            axisY.Children.Add(new LineGeometry(new Point(xmin, ymin), new Point(xmin, ymax)));
